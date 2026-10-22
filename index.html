@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trade Pulse – Group buying for MSMEs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ LOGIN / REGISTER ============ -->
+<main id="authView" class="auth" hidden>
+  <section class="hero">
+    <div class="brand"><span class="logo" aria-hidden="true"></span>Trade Pulse</div>
+    <h1>Order together with MSMEs within 50&nbsp;km and reach the factory’s Tier&nbsp;1 price.</h1>
+    <p class="lead">Pool your quantity with nearby buyers. Your payment stays in escrow until the goods arrive.</p>
+    <div id="heroMap" class="hero-map" aria-hidden="true"></div>
+  </section>
+
+  <section class="auth-card">
+    <div class="tabs" role="tablist">
+      <button class="tab active" role="tab" id="tabLogin" aria-selected="true" data-auth="login">Log in</button>
+      <button class="tab" role="tab" id="tabRegister" aria-selected="false" data-auth="register">Create account</button>
+    </div>
+
+    <form id="loginForm" novalidate autocomplete="on">
+      <h2>Welcome back</h2>
+      <label>Work email
+        <input type="email" id="loginEmail" autocomplete="username" required>
+      </label>
+      <label>Password
+        <input type="password" id="loginPassword" autocomplete="current-password" required>
+      </label>
+      <p class="error" id="loginError" role="alert"></p>
+      <button class="btn primary block" type="submit" id="loginBtn">Log in</button>
+      <p class="hint">Trying the demo? <button type="button" class="link" id="fillDemo">Fill in the demo login</button></p>
+    </form>
+
+    <form id="registerForm" novalidate hidden autocomplete="on">
+      <h2>Register your business</h2>
+      <label>Business name
+        <input type="text" id="regBiz" autocomplete="organization" required>
+      </label>
+      <label>Work email
+        <input type="email" id="regEmail" autocomplete="username" required>
+      </label>
+      <label>Password
+        <input type="password" id="regPassword" autocomplete="new-password" required>
+        <small>At least 8 characters, with a letter and a number.</small>
+      </label>
+      <label>Distance from the factory hub (km)
+        <input type="number" id="regKm" min="1" max="500" step="1" required>
+        <small>Only businesses within 50 km can join the corridor.</small>
+      </label>
+      <p class="error" id="registerError" role="alert"></p>
+      <button class="btn primary block" type="submit" id="registerBtn">Create account</button>
+    </form>
+
+    <div class="divider"><span>or</span></div>
+    <div id="googleArea">
+      <div id="googleBtn"></div>
+      <p class="hint center" id="googleNote"></p>
+    </div>
+  </section>
+</main>
+
+<!-- ============ APP ============ -->
+<div id="appView" hidden>
+  <header class="topbar">
+    <div class="brand dark"><span class="logo" aria-hidden="true"></span>Trade Pulse</div>
+    <nav class="app-tabs" aria-label="Sections">
+      <button class="app-tab active" data-tab="deals">Group deals</button>
+      <button class="app-tab" data-tab="orders">My orders <span class="count" id="orderCount">0</span></button>
+      <button class="app-tab" data-tab="corridor">My corridor</button>
+    </nav>
+    <div class="user">
+      <img id="userPic" class="avatar" alt="" width="36" height="36" referrerpolicy="no-referrer" hidden>
+      <div class="user-meta"><strong id="userName"></strong><span id="userKm"></span></div>
+      <button class="btn ghost" id="logoutBtn">Log out</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <section id="panel-deals" class="panel">
+      <div class="page-head">
+        <h2>Open group deals</h2>
+        <p>Every unit you add moves the whole pool closer to the next price tier. Everyone in the pool pays the final tier price.</p>
+      </div>
+      <ol class="escrow-flow">
+        <li><b>You pay into escrow</b><span>Funds are locked, not sent to the factory.</span></li>
+        <li><b>Pool reaches Tier 1</b><span>The deal closes and the factory confirms.</span></li>
+        <li><b>Factory dispatches</b><span>Your money stays locked until you receive the goods.</span></li>
+        <li><b>You confirm delivery</b><span>The factory is paid and any price difference comes back to you.</span></li>
+      </ol>
+      <div class="toolbar">
+        <input type="search" id="dealSearch" placeholder="Search products or suppliers" aria-label="Search deals" autocomplete="off">
+        <select id="dealSort" aria-label="Sort deals">
+          <option value="discount">Biggest group discount</option>
+          <option value="closing">Closing soon</option>
+          <option value="buyers">Most businesses joined</option>
+        </select>
+      </div>
+      <div id="catChips" class="chips" role="group" aria-label="Product categories"></div>
+      <p class="result-count" id="dealCount"></p>
+      <div id="dealGrid" class="deal-grid"></div>
+    </section>
+
+    <section id="panel-orders" class="panel" hidden>
+      <div class="page-head">
+        <h2>My orders and escrow</h2>
+        <p>Track where your money is at every step.</p>
+      </div>
+      <div id="escrowSummary" class="summary"></div>
+      <div id="orderList" class="order-list"></div>
+    </section>
+
+    <section id="panel-corridor" class="panel" hidden>
+      <div class="page-head">
+        <h2>My 50 km corridor</h2>
+        <p>Businesses around the factory hub who can pool orders with you.</p>
+      </div>
+      <p class="map-note" id="mapNote"></p>
+      <div class="corridor-wrap">
+        <div id="corridorMap" class="corridor-map"></div>
+        <div id="corridorList" class="corridor-list"></div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span>Demo build: products, suppliers, prices, payments and escrow are sample or simulated. Data is stored in this browser only.</span>
+      <button class="link" id="resetDemo">Reset demo data</button>
+    </footer>
+  </main>
+</div>
+
+<!-- ============ JOIN MODAL ============ -->
+<dialog id="joinModal" class="modal">
+  <form id="joinForm" novalidate>
+    <div id="joinBody"></div>
+  </form>
+</dialog>
+
+<!-- ============ GOOGLE: FINISH PROFILE ============ -->
+<dialog id="profileModal" class="modal">
+  <form id="profileForm" novalidate>
+    <h3>One last step</h3>
+    <p class="sub" id="profileSub"></p>
+    <label>Business name
+      <input type="text" id="profBiz" autocomplete="organization" required>
+    </label>
+    <label>Distance from the factory hub (km)
+      <input type="number" id="profKm" min="1" max="500" step="1" required>
+      <small>Only businesses within 50 km can join the corridor.</small>
+    </label>
+    <p class="error" id="profileError" role="alert"></p>
+    <div class="modal-actions">
+      <button type="button" class="btn ghost" id="profileCancel">Cancel</button>
+      <button type="submit" class="btn primary">Create account</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
